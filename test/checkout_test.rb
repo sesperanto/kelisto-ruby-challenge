@@ -1,6 +1,7 @@
-# require 'test_helper'
+require "minitest/autorun"
+require_relative '../lib/checkout'
 
-class CheckoutTest < ActiveSupport::TestCase
+class CheckoutTest < Minitest::Test
 
   OPTIONS = {
     'GR1' => {
@@ -14,17 +15,17 @@ class CheckoutTest < ActiveSupport::TestCase
     }
   }
 
-  test "checkout is created without params" do
+  def checkout_is_created_without_params
     checkout = Checkout.new
     assert checkout
   end
 
-  test "add options" do
+  def add_options
     checkout = Checkout.new( {opt: 'Hola mundo. Esto es una opcion!'} )
     assert_not_empty checkout.options
   end
 
-  test "add two items" do
+  def add_two_items
     checkout = Checkout.new
     checkout.scan( %w(GR1 GR1) )
     assert_equal 2, checkout.items.size
@@ -32,7 +33,7 @@ class CheckoutTest < ActiveSupport::TestCase
 
   # Basket: GR1,SR1,GR1,GR1,CF1
   # Total price expected: £22.45
-  test "test data 1" do
+  def test_data_1
     checkout = Checkout.new(OPTIONS)
     checkout.scan( %w(GR1 SR1 GR1 GR1 CF1) )
     assert_equal 22.45, checkout.total
@@ -40,7 +41,7 @@ class CheckoutTest < ActiveSupport::TestCase
 
   # Basket: GR1,GR1
   # Total price expected: £3.11
-  test "test data 2" do
+  def test_data_2
     checkout = Checkout.new(OPTIONS)
     checkout.scan( %w(GR1 GR1) )
     assert_equal 3.11, checkout.total
@@ -48,10 +49,18 @@ class CheckoutTest < ActiveSupport::TestCase
 
   # Basket: SR1,SR1,GR1,SR1
   # Total price expected: £16.61
-  test "test data 3" do
+  def test_data_3
     checkout = Checkout.new(OPTIONS)
     checkout.scan( %w(SR1 SR1 GR1 SR1) )
     assert_equal 16.61, checkout.total
+  end
+
+  # Basket: empty
+  # Total price expected: £0
+  def test_data_4
+    checkout = Checkout.new(OPTIONS)
+    checkout.scan( %w() )
+    assert_equal 0, checkout.total
   end
 
 end
